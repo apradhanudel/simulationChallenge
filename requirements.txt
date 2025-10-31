@@ -2,4 +2,5 @@ daft-pgm
 numpy
 pandas
 matplotlib
+seaborn
 jupyter

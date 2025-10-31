@@ -146,6 +146,7 @@ Briefly narrate and visualize what happens to your account balance over the cour
 
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 # Set seed for reproducibility
 # Using seed 1 to get heads on first flip (better for demonstration)
@@ -224,9 +225,14 @@ TODO: Visually and narratively describe the distribution of your account balance
 
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Set seaborn style for better-looking plots
+sns.set_style("whitegrid")
+sns.set_palette("husl")
 
 # Set seed for reproducibility
-np.random.seed(42)
+np.random.seed(100)
 
 # Parameters
 n_simulations = 100
@@ -253,9 +259,9 @@ mean_balance = np.mean(final_balances)
 median_balance = np.median(final_balances)
 prob_above_30000 = np.mean(final_balances > initial_balance)
 
-# Create histogram
+# Create histogram using seaborn
 fig, ax = plt.subplots(figsize=(10, 6))
-ax.hist(final_balances, bins=20, edgecolor='black', alpha=0.7, color='steelblue')
+sns.histplot(final_balances, bins=20, kde=True, edgecolor='black', alpha=0.7, color='steelblue', ax=ax)
 ax.axvline(x=initial_balance, color='red', linestyle='--', linewidth=2.5, label='Initial Investment ($30,000)')
 ax.axvline(x=mean_balance, color='green', linestyle='--', linewidth=2, label=f'Mean: ${mean_balance:,.0f}')
 ax.axvline(x=median_balance, color='orange', linestyle='--', linewidth=2, label=f'Median: ${median_balance:,.0f}')
@@ -264,7 +270,6 @@ ax.set_xlabel('Final Balance ($)', fontsize=12, fontweight='bold')
 ax.set_ylabel('Frequency', fontsize=12, fontweight='bold')
 ax.set_title('Distribution of Final Balances Across 100 Simulations', fontsize=14, fontweight='bold')
 ax.legend(fontsize=10)
-ax.grid(True, alpha=0.3, axis='y')
 ax.ticklabel_format(style='plain', axis='x')  # Avoid scientific notation
 
 plt.tight_layout()
@@ -321,9 +326,14 @@ Instead of having the full balance at risk with each coin flip, assume only 25% 
 
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Set seaborn style for better-looking plots
+sns.set_style("whitegrid")
+sns.set_palette("husl")
 
 # Set seed for reproducibility
-np.random.seed(42)
+np.random.seed(100)
 
 # Parameters
 n_simulations = 100
@@ -376,8 +386,8 @@ mod_prob = np.mean(modified_final > initial_balance)
 # Create side-by-side comparison
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6), sharey=True)
 
-# Original game histogram
-ax1.hist(original_final, bins=20, edgecolor='black', alpha=0.7, color='steelblue')
+# Original game histogram using seaborn
+sns.histplot(original_final, bins=20, kde=True, edgecolor='black', alpha=0.7, color='steelblue', ax=ax1)
 ax1.axvline(x=initial_balance, color='red', linestyle='--', linewidth=2, label='Initial ($30,000)')
 ax1.axvline(x=orig_mean, color='green', linestyle='--', linewidth=1.5, alpha=0.7, label=f'Mean: ${orig_mean:,.0f}')
 ax1.axvline(x=orig_median, color='orange', linestyle='--', linewidth=1.5, alpha=0.7, label=f'Median: ${orig_median:,.0f}')
@@ -385,18 +395,16 @@ ax1.set_xlabel('Final Balance ($)', fontsize=11, fontweight='bold')
 ax1.set_ylabel('Frequency', fontsize=11, fontweight='bold')
 ax1.set_title('Original Strategy\n(Bet 100% each round)', fontsize=12, fontweight='bold')
 ax1.legend(fontsize=9)
-ax1.grid(True, alpha=0.3, axis='y')
 ax1.ticklabel_format(style='plain', axis='x')
 
-# Modified game histogram
-ax2.hist(modified_final, bins=20, edgecolor='black', alpha=0.7, color='purple')
+# Modified game histogram using seaborn
+sns.histplot(modified_final, bins=20, kde=True, edgecolor='black', alpha=0.7, color='purple', ax=ax2)
 ax2.axvline(x=initial_balance, color='red', linestyle='--', linewidth=2, label='Initial ($30,000)')
 ax2.axvline(x=mod_mean, color='green', linestyle='--', linewidth=1.5, alpha=0.7, label=f'Mean: ${mod_mean:,.0f}')
 ax2.axvline(x=mod_median, color='orange', linestyle='--', linewidth=1.5, alpha=0.7, label=f'Median: ${mod_median:,.0f}')
 ax2.set_xlabel('Final Balance ($)', fontsize=11, fontweight='bold')
 ax2.set_title('Modified Strategy\n(Bet 25% each round)', fontsize=12, fontweight='bold')
 ax2.legend(fontsize=9)
-ax2.grid(True, alpha=0.3, axis='y')
 ax2.ticklabel_format(style='plain', axis='x')
 
 plt.tight_layout()

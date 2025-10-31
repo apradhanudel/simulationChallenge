@@ -197,7 +197,7 @@ Outcome: PROFITABLE - You would be happy with this outcome as you gained $15,000
 <div class="cell-output cell-output-display">
 <div id="q3-dist-100-py" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="index_files/figure-html/q3-dist-100-py-output-1.png" width="951" height="566" class="figure-img"></p>
+<p><img src="index_files/figure-html/q3-dist-100-py-output-1.png" width="950" height="565" class="figure-img"></p>
 <figcaption>Distribution of final balances across 100 simulations</figcaption>
 </figure>
 </div>
@@ -205,14 +205,14 @@ Outcome: PROFITABLE - You would be happy with this outcome as you gained $15,000
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Simulation Statistics (n=100):
-Mean final balance: $63,931.04
+Mean final balance: $41,027.16
 Median final balance: $17,714.70
-P(final &gt; $30,000): 0.350 (35.0%)
-Min final balance: $453.50
+P(final &gt; $30,000): 0.420 (42.0%)
+Min final balance: $1,133.74
 Max final balance: $691,980.47
 
 Interpretation:
-Out of 100 simulations, 35 ended above the initial investment of $30,000.
+Out of 100 simulations, 42 ended above the initial investment of $30,000.
 Most outcomes are losses (P &lt; 0.5), suggesting the investment is risky despite positive single-flip EV.</code></pre>
 </div>
 </div>
@@ -222,8 +222,8 @@ Most outcomes are losses (P &lt; 0.5), suggesting the investment is risky despit
 <p>TODO: Report the probability estimate and interpret its practical meaning.</p>
 <div id="q4-prob-original-py" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-stdout">
-<pre><code>Probability of final balance &gt; $30,000: 0.350 (35.0%)
-This means that there is a 35.0% chance that your account balance will be greater than $30,000 at age 75.</code></pre>
+<pre><code>Probability of final balance &gt; $30,000: 0.420 (42.0%)
+This means that there is a 42.0% chance that your account balance will be greater than $30,000 at age 75.</code></pre>
 </div>
 </div>
 </section>
@@ -234,7 +234,7 @@ This means that there is a 35.0% chance that your account balance will be greate
 <div class="cell-output cell-output-display">
 <div id="q5-modified-50pct-py" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="index_files/figure-html/q5-modified-50pct-py-output-1.png" width="1331" height="566" class="figure-img"></p>
+<p><img src="index_files/figure-html/q5-modified-50pct-py-output-1.png" width="1334" height="566" class="figure-img"></p>
 <figcaption>Modified strategy distribution (bet 25% each round)</figcaption>
 </figure>
 </div>
@@ -246,17 +246,17 @@ COMPARISON: Original vs Modified Strategy
 ======================================================================
 
 Original Strategy (Bet 100% each round):
-  Mean:   $48,979.06
+  Mean:   $46,596.61
   Median: $17,714.70
-  P(&gt; $30K): 0.310 (31.0%)
+  P(&gt; $30K): 0.370 (37.0%)
 
 Modified Strategy (Bet 25% each round):
-  Mean:   $33,519.80
+  Mean:   $32,256.25
   Median: $31,922.46
-  P(&gt; $30K): 0.540 (54.0%)
+  P(&gt; $30K): 0.630 (63.0%)
 
 ----------------------------------------------------------------------
-✅ Modified strategy has HIGHER probability of profit (54.0% vs 31.0%)
+✅ Modified strategy has HIGHER probability of profit (63.0% vs 37.0%)
 ✅ Modified strategy has HIGHER median returns ($31,922 vs $17,715)
 ⚠️  Original strategy has HIGHER expected value due to more extreme outcomes
 ======================================================================</code></pre>
