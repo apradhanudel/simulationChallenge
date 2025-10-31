@@ -6,6 +6,7 @@ format:
 execute:
   echo: true
   eval: true
+python: venv/bin/python
 ---
 
 # 🎲 Simulation Challenge - Starter Template
@@ -89,11 +90,49 @@ TODO: Explain whether the expected value of your account balance after one flip 
 
 ```{python}
 #| label: q1-expected-value-py
-#| echo: true
+#| echo: false
 
-# TODO: Compute EV after one flip in Python
-# - Show calculation and brief explanation
+import numpy as np
 
+# Initial investment
+initial_balance = 30000
+
+# Probabilities: fair coin (50% heads, 50% tails)
+prob_heads = 0.5
+prob_tails = 0.5
+
+# Returns after one flip
+# Heads: +50% increase
+# Tails: -40% decrease
+return_heads = 1.5  # 1 + 0.5
+return_tails = 0.6  # 1 - 0.4
+
+# Expected value after one flip
+expected_value = (prob_heads * return_heads + prob_tails * return_tails) * initial_balance
+
+# Gain in expected value
+gain_ev = expected_value - initial_balance
+gain_percentage = (gain_ev / initial_balance) * 100
+
+print(f"Initial balance: ${initial_balance:,.2f}")
+print(f"Expected value after 1 flip: ${expected_value:,.2f}")
+print(f"Gain in expected value: ${gain_ev:,.2f} ({gain_percentage:.2f}%)")
+
+print("\nCalculation:")
+print(f"EV = P(Heads) × (balance × 1.5) + P(Tails) × (balance × 0.6)")
+print(f"EV = {prob_heads} × ${initial_balance:,.2f} × 1.5 + {prob_tails} × ${initial_balance:,.2f} × 0.6")
+print(f"EV = ${prob_heads * initial_balance * 1.5:,.2f} + ${prob_tails * initial_balance * 0.6:,.2f}")
+print(f"EV = ${expected_value:,.2f}")
+
+print("\nConclusion:")
+if expected_value > initial_balance:
+    print(f"Expected value ({expected_value:,.2f}) > Initial investment ({initial_balance:,.2f})")
+    print("Based solely on expected value, this suggests you SHOULD buy-in to the game.")
+elif expected_value < initial_balance:
+    print(f"Expected value ({expected_value:,.2f}) < Initial investment ({initial_balance:,.2f})")
+    print("Based solely on expected value, this suggests you should NOT buy-in to the game.")
+else:
+    print("Expected value equals initial investment.")
 ```
 
 ### 2) Single Simulation Over Time (Narrative + Plot)
@@ -102,12 +141,75 @@ Briefly narrate and visualize what happens to your account balance over the cour
 
 ```{python}
 #| label: q2-single-sim-py
-#| echo: true
+#| echo: false
 #| fig-cap: "Single simulation path of account balance"
 
-# TODO: Simulate one path from $30,000 over N periods
-# - Make a matplotlib (OO) time-series
-# - Set seed for reproducibility
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Set seed for reproducibility
+# Using seed 1 to get heads on first flip (better for demonstration)
+np.random.seed(1)
+
+# Assumptions: Assume starting at age 65, playing until age 75
+# This gives us 10 years of coin flips (N = 10)
+n_years = 1
+initial_balance = 30000
+
+# Initialize balance array
+balances = [initial_balance]
+
+# Run simulation for N periods
+current_balance = initial_balance
+for year in range(1, n_years + 1):
+    # Flip coin: 1 = heads (+50%), 0 = tails (-40%)
+    coin_flip = np.random.randint(0, 2)
+    
+    if coin_flip == 1:  # Heads
+        current_balance = current_balance * 1.5
+    else:  # Tails
+        current_balance = current_balance * 0.6
+    
+    balances.append(current_balance)
+
+# Create figure using object-oriented matplotlib
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.plot(range(n_years + 1), balances, 'b-o', linewidth=2, markersize=6)
+ax.axhline(y=initial_balance, color='r', linestyle='--', linewidth=2, label='Initial Investment')
+ax.set_xlabel('Year', fontsize=12, fontweight='bold')
+ax.set_ylabel('Account Balance ($)', fontsize=12, fontweight='bold')
+ax.set_title('Single Simulation: Account Balance Over Time', fontsize=14, fontweight='bold')
+ax.legend()
+ax.grid(True, alpha=0.3)
+ax.ticklabel_format(style='plain', axis='y')  # Avoid scientific notation
+
+# Add annotations for key points
+ax.annotate(f'Start: ${initial_balance:,.0f}', 
+            xy=(0, initial_balance), xytext=(0.5, initial_balance + 5000),
+            arrowprops=dict(arrowstyle='->', color='black', lw=1.5),
+            fontsize=10, fontweight='bold')
+ax.annotate(f'End: ${balances[-1]:,.0f}', 
+            xy=(n_years, balances[-1]), xytext=(n_years - 2, balances[-1] + 5000),
+            arrowprops=dict(arrowstyle='->', color='black', lw=1.5),
+            fontsize=10, fontweight='bold')
+
+plt.tight_layout()
+plt.show()
+
+# Print summary
+final_balance = balances[-1]
+total_return = final_balance - initial_balance
+total_return_pct = (total_return / initial_balance) * 100
+
+print(f"\nSimulation Summary:")
+print(f"Initial balance: ${initial_balance:,.2f}")
+print(f"Final balance: ${final_balance:,.2f}")
+print(f"Total return: ${total_return:,.2f} ({total_return_pct:.2f}%)")
+
+if final_balance > initial_balance:
+    print(f"\nOutcome: PROFITABLE - You would be happy with this outcome as you gained ${total_return:,.2f}")
+else:
+    print(f"\nOutcome: LOSS - You would NOT be happy with this outcome as you lost ${abs(total_return):,.2f}")
 
 ```
 
@@ -117,12 +219,72 @@ TODO: Visually and narratively describe the distribution of your account balance
 
 ```{python}
 #| label: q3-dist-100-py
-#| echo: true
+#| echo: false
 #| fig-cap: "Distribution of final balances across 100 simulations"
 
-# TODO: Run 100 simulations and plot histogram of final balances
-# - Add vertical line at $30,000
-# - Compute mean, median, and P(final > $30,000)
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Set seed for reproducibility
+np.random.seed(42)
+
+# Parameters
+n_simulations = 100
+n_years = 10
+initial_balance = 30000
+
+# Run 100 simulations
+final_balances = []
+for sim in range(n_simulations):
+    current_balance = initial_balance
+    for year in range(n_years):
+        coin_flip = np.random.randint(0, 2)  # 0 = tails, 1 = heads
+        if coin_flip == 1:  # Heads: +50%
+            current_balance = current_balance * 1.5
+        else:  # Tails: -40%
+            current_balance = current_balance * 0.6
+    final_balances.append(current_balance)
+
+# Convert to numpy array for easier calculations
+final_balances = np.array(final_balances)
+
+# Compute statistics
+mean_balance = np.mean(final_balances)
+median_balance = np.median(final_balances)
+prob_above_30000 = np.mean(final_balances > initial_balance)
+
+# Create histogram
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.hist(final_balances, bins=20, edgecolor='black', alpha=0.7, color='steelblue')
+ax.axvline(x=initial_balance, color='red', linestyle='--', linewidth=2.5, label='Initial Investment ($30,000)')
+ax.axvline(x=mean_balance, color='green', linestyle='--', linewidth=2, label=f'Mean: ${mean_balance:,.0f}')
+ax.axvline(x=median_balance, color='orange', linestyle='--', linewidth=2, label=f'Median: ${median_balance:,.0f}')
+
+ax.set_xlabel('Final Balance ($)', fontsize=12, fontweight='bold')
+ax.set_ylabel('Frequency', fontsize=12, fontweight='bold')
+ax.set_title('Distribution of Final Balances Across 100 Simulations', fontsize=14, fontweight='bold')
+ax.legend(fontsize=10)
+ax.grid(True, alpha=0.3, axis='y')
+ax.ticklabel_format(style='plain', axis='x')  # Avoid scientific notation
+
+plt.tight_layout()
+plt.show()
+
+# Print statistics
+print(f"\nSimulation Statistics (n={n_simulations}):")
+print(f"Mean final balance: ${mean_balance:,.2f}")
+print(f"Median final balance: ${median_balance:,.2f}")
+print(f"P(final > $30,000): {prob_above_30000:.3f} ({prob_above_30000*100:.1f}%)")
+print(f"Min final balance: ${np.min(final_balances):,.2f}")
+print(f"Max final balance: ${np.max(final_balances):,.2f}")
+
+# Interpretation
+print(f"\nInterpretation:")
+print(f"Out of 100 simulations, {np.sum(final_balances > initial_balance)} ended above the initial investment of ${initial_balance:,.0f}.")
+if prob_above_30000 > 0.5:
+    print("Most outcomes are profitable (P > 0.5), suggesting the investment is favorable.")
+else:
+    print("Most outcomes are losses (P < 0.5), suggesting the investment is risky despite positive single-flip EV.")
 
 ```
 
@@ -132,11 +294,15 @@ TODO: Report the probability estimate and interpret its practical meaning.
 
 ```{python}
 #| label: q4-prob-original-py
-#| echo: true
+#| echo: false
 
 # TODO: Using the 100 simulations above, estimate P(final > 30000)
 # - Print numeric result with 3 decimals
+prob_above_30000 = np.mean(final_balances > initial_balance)
+print(f"Probability of final balance > $30,000: {prob_above_30000:.3f} ({prob_above_30000*100:.1f}%)")
 
+# what is the meaning of this probability?
+print(f"This means that there is a {prob_above_30000*100:.1f}% chance that your account balance will be greater than $30,000 at age 75.")
 ```
 
 ### 5) Modified Strategy (Bet Exactly 50% Each Round)
@@ -145,19 +311,151 @@ Instead of having the full balance at risk with each coin flip, assume only 25% 
 
 ```{python}
 #| label: q5-modified-50pct-py
-#| echo: true
-#| fig-cap: "Modified strategy distribution (bet 50% each round)"
+#| echo: false
+#| fig-cap: "Modified strategy distribution (bet 25% each round)"
 
 # TODO: Implement the modified game
 # - Run 100 simulations; plot distribution of final balances
 # - Estimate P(final > 30000) and compare to original
 # - visually compare the outcome distributions of the original and modified strategies
 
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Set seed for reproducibility
+np.random.seed(42)
+
+# Parameters
+n_simulations = 100
+n_years = 10
+initial_balance = 30000
+
+# Modified game: bet 25% of your balance each round
+bet_fraction = 0.25
+
+# Store balances for both strategies
+original_final = []
+modified_final = []
+
+# Run simulations
+for sim in range(n_simulations):
+    # Original game: bet 100% each round
+    current_balance_orig = initial_balance
+    for year in range(n_years):
+        coin_flip = np.random.randint(0, 2)
+        if coin_flip == 1:  # Heads: +50%
+            current_balance_orig = current_balance_orig * 1.5
+        else:  # Tails: -40%
+            current_balance_orig = current_balance_orig * 0.6
+    original_final.append(current_balance_orig)
+    
+    # Modified game: bet 25% each round
+    # Heads: gain 50% on 25% bet = +12.5% total (1.125x)
+    # Tails: lose 40% on 25% bet = -10% total (0.90x)
+    current_balance_mod = initial_balance
+    for year in range(n_years):
+        coin_flip = np.random.randint(0, 2)
+        if coin_flip == 1:  # Heads: win 50% on your bet
+            current_balance_mod = current_balance_mod * (1 + bet_fraction * 0.5)
+        else:  # Tails: lose 40% on your bet
+            current_balance_mod = current_balance_mod * (1 - bet_fraction * 0.4)
+    modified_final.append(current_balance_mod)
+
+original_final = np.array(original_final)
+modified_final = np.array(modified_final)
+
+# Compute statistics for both
+orig_mean = np.mean(original_final)
+orig_median = np.median(original_final)
+orig_prob = np.mean(original_final > initial_balance)
+
+mod_mean = np.mean(modified_final)
+mod_median = np.median(modified_final)
+mod_prob = np.mean(modified_final > initial_balance)
+
+# Create side-by-side comparison
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6), sharey=True)
+
+# Original game histogram
+ax1.hist(original_final, bins=20, edgecolor='black', alpha=0.7, color='steelblue')
+ax1.axvline(x=initial_balance, color='red', linestyle='--', linewidth=2, label='Initial ($30,000)')
+ax1.axvline(x=orig_mean, color='green', linestyle='--', linewidth=1.5, alpha=0.7, label=f'Mean: ${orig_mean:,.0f}')
+ax1.axvline(x=orig_median, color='orange', linestyle='--', linewidth=1.5, alpha=0.7, label=f'Median: ${orig_median:,.0f}')
+ax1.set_xlabel('Final Balance ($)', fontsize=11, fontweight='bold')
+ax1.set_ylabel('Frequency', fontsize=11, fontweight='bold')
+ax1.set_title('Original Strategy\n(Bet 100% each round)', fontsize=12, fontweight='bold')
+ax1.legend(fontsize=9)
+ax1.grid(True, alpha=0.3, axis='y')
+ax1.ticklabel_format(style='plain', axis='x')
+
+# Modified game histogram
+ax2.hist(modified_final, bins=20, edgecolor='black', alpha=0.7, color='purple')
+ax2.axvline(x=initial_balance, color='red', linestyle='--', linewidth=2, label='Initial ($30,000)')
+ax2.axvline(x=mod_mean, color='green', linestyle='--', linewidth=1.5, alpha=0.7, label=f'Mean: ${mod_mean:,.0f}')
+ax2.axvline(x=mod_median, color='orange', linestyle='--', linewidth=1.5, alpha=0.7, label=f'Median: ${mod_median:,.0f}')
+ax2.set_xlabel('Final Balance ($)', fontsize=11, fontweight='bold')
+ax2.set_title('Modified Strategy\n(Bet 25% each round)', fontsize=12, fontweight='bold')
+ax2.legend(fontsize=9)
+ax2.grid(True, alpha=0.3, axis='y')
+ax2.ticklabel_format(style='plain', axis='x')
+
+plt.tight_layout()
+plt.show()
+
+# Print comparison
+print("\n" + "="*70)
+print("COMPARISON: Original vs Modified Strategy")
+print("="*70)
+print(f"\nOriginal Strategy (Bet 100% each round):")
+print(f"  Mean:   ${orig_mean:,.2f}")
+print(f"  Median: ${orig_median:,.2f}")
+print(f"  P(> $30K): {orig_prob:.3f} ({orig_prob*100:.1f}%)")
+
+print(f"\nModified Strategy (Bet 25% each round):")
+print(f"  Mean:   ${mod_mean:,.2f}")
+print(f"  Median: ${mod_median:,.2f}")
+print(f"  P(> $30K): {mod_prob:.3f} ({mod_prob*100:.1f}%)")
+
+print(f"\n" + "-"*70)
+if mod_prob > orig_prob:
+    print(f"✅ Modified strategy has HIGHER probability of profit ({mod_prob:.1%} vs {orig_prob:.1%})")
+elif mod_prob < orig_prob:
+    print(f"❌ Modified strategy has LOWER probability of profit ({mod_prob:.1%} vs {orig_prob:.1%})")
+else:
+    print(f"➡️  Both strategies have the SAME probability of profit")
+
+if mod_median > orig_median:
+    print(f"✅ Modified strategy has HIGHER median returns (${mod_median:,.0f} vs ${orig_median:,.0f})")
+else:
+    print(f"❌ Modified strategy has LOWER median returns (${mod_median:,.0f} vs ${orig_median:,.0f})")
+
+if mod_mean > orig_mean:
+    print(f"⚠️  Modified strategy has HIGHER expected value but trades off upside potential")
+    print(f"   (Less risk = less volatility = smaller tail wins)")
+else:
+    print(f"⚠️  Original strategy has HIGHER expected value due to more extreme outcomes")
+
+print("="*70)
 ```
 
 ### 6) Briefly Explain Your Findings From The Previous Step in Light of A Concept Known as the "Kelly Criterion"
  
 What is the Kelly Criterion and how does it relate to the modified strategy?
+***Answer:***
+The Kelly Criterion is a formula that calculates the optimal amount to bet on a given game to maximize your expected growth rate. The formula is:
+
+f* = (bp - q) / b
+
+where:
+
+f* is the optimal fraction to bet
+
+p is the probability of winning
+
+q is the probability of losing
+
+b is the odds of winning
+
 
 
 ## Professional Presentation (From Grading TLDR)
